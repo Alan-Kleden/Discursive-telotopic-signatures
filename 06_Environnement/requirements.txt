@@ -1,0 +1,40 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# Core scientific stack
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.1
+scikit-learn==1.4.2
+statsmodels==0.14.2
+
+# Visualization
+matplotlib==3.8.4
+seaborn==0.13.2
+
+# NLP / Transformers (pins compatibles avec spaCy Transformers 1.3.5)
+torch==2.7.1+cpu
+transformers==4.35.2
+tokenizers==0.15.2
+huggingface-hub==0.35.3
+sentence-transformers==2.7.0
+spacy==3.7.4
+spacy-transformers==1.3.5
+spacy-alignments==0.9.0
+nltk==3.8.1
+
+# Text processing
+emoji==2.12.1
+beautifulsoup4==4.12.3
+lxml==5.2.1
+requests==2.31.0
+
+# Time series / circular stats
+ruptures==1.1.9
+pycircstat==0.0.2
+
+# Utilities
+tqdm==4.66.4
+pyyaml==6.0.2
+
+# Dev
+jupyterlab==4.2.1
