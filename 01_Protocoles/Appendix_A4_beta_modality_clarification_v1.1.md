@@ -64,5 +64,41 @@ Other channels and weights \((\alpha,\gamma,\delta,\varepsilon)\) remain unchang
 
 This clarification does **not** modify any confirmatory tests (H1–H4), thresholds (\(\Delta\)AUC, \(\Delta R^2\), FDR, etc.), or the fixed weights \(\alpha\ldots\varepsilon\). It only specifies how **β** is computed from already defined quantities (conation + alignment), with \(\lambda=0.5\) fixed *a priori*.
 
-**Date:** 2025-10-03  
-**Links:** OSF preregistration (reference) • Git tag `prereg-clarif-v1.1`
+### Implementation and Artifacts (fixed a priori)
+
+- **Code implementing β (modality):**  
+  `04_Code_Scripts/features/fc_fi_v3.py` (commit `SHA`, tag `TAG`)
+
+- **Conative lexicon (fixed weights):**  
+  `01_Protocoles/lexicon_conative.csv` (commit `SHA`, tag `TAG`)  
+  CSV schema: `lemma,type,weight,lang`  
+  Example rows:
+    devoir,push,0.9,fr
+    falloir,push,0.8,fr
+    empêcher,inhibit,0.9,fr
+    bloquer,inhibit,0.85,fr
+    must,push,0.9,en
+    prevent,inhibit,0.9,en
+    
+- **Unit tests (bounds, neutrality, monotonicity, limit cases):**  
+`tests/test_beta_modality.py` (commit `SHA`, tag `TAG`)
+
+- **Fixed cross-term coefficient:**  
+λ = 0.5 (set a priori; not tuned)
+
+- **Directional alignment a(d, T):**  
+Derived from the preregistered theta; we only remap to `[0,1]` as:
+`a = (cos(theta) + 1) / 2`. This does not alter geometry, thresholds, or hypotheses.
+
+- **Fc/Fi construction (symmetric form):**
+Fc(d,T) = p(d) * a(d,T) + λ * h(d) * (1 - a(d,T))
+Fi(d,T) = h(d) * a(d,T) + λ * p(d) * (1 - a(d,T))
+
+with `λ = 0.5`, `p,h ∈ [0,1]`, hence `Fc, Fi ∈ [0,1]`.
+
+- **Scalar used for β in N_tel:**
+M(d,T) = Fc(d,T) - Fi(d,T) # in [-1, 1]
+β(d,T) = (M(d,T) + 1) / 2 # in [0, 1]
+
+
+**Provenance note.** The above artifacts were committed and tagged **before any target-corpus collection or feature extraction** (date: `2025-10-03`). OSF upload references Git tag `TAG`.

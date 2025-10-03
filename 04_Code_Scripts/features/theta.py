@@ -1,31 +1,35 @@
-# theta.py — projection rudimentaire vs telos → cosθ, sinθ
+# 04_Code_Scripts/features/theta.py
 from __future__ import annotations
 import numpy as np
 import pandas as pd
-import re
-from typing import Dict, List
 
-def _tok(s: str) -> List[str]:
-    return re.findall(r"[a-zàâäéèêëîïôöùûüç'-]+", s.lower(), flags=re.I)
+def _remap_01(x: pd.Series | np.ndarray) -> pd.Series:
+    # remap from [-1,1] -> [0,1]
+    return (x + 1.0) / 2.0
 
-def cos_sin_theta_for_doc(text: str, telos_keywords: List[str], fc: float, fi: float) -> tuple[float,float]:
+def add_theta_features(df: pd.DataFrame,
+                       cos_col: str = "cos_theta",
+                       align_col: str = "alignment") -> pd.DataFrame:
     """
-    Heuristique robuste :
-    - cosθ = clamp( (fc - fi), [-1,1] )
-    - sinθ = signe basé sur présence de mots-telos vs anti-mots approx.
-      Ici on fixe sinθ = 0 pour simplicité (tests ne requièrent que cosθ).
-    """
-    cos_t = float(np.clip(fc - fi, -1.0, 1.0))
-    sin_t = 0.0
-    return cos_t, sin_t
+    Ensure an 'alignment' scalar in [0,1] is present, derived from cos_theta if available.
+    Falls back to a weak proxy if cos_theta is absent (safe for mock/v2).
 
-def apply_theta(df: pd.DataFrame, teloi: Dict[str, Dict[str, List[str]]]) -> pd.DataFrame:
+    Inputs:
+      - df must contain at least a document-level row; if 'cos_theta' exists in [-1,1],
+        alignment := (cos_theta + 1)/2 ; else use a neutral default 0.5.
+
+    Returns:
+      df with ensured column `alignment` in [0,1].
+    """
     out = df.copy()
-    cos_list, sin_list = [], []
-    for actor, domain, text, fc, fi in zip(out["actor_id"], out["domain_id"], out["text"], out["fc_mean"], out["fi_mean"]):
-        telos_kw = teloi.get(actor, {}).get(domain, [])
-        c, s = cos_sin_theta_for_doc(text, telos_kw, fc, fi)
-        cos_list.append(c); sin_list.append(s)
-    out["cos_theta"] = cos_list
-    out["sin_theta"] = sin_list
+    if cos_col in out.columns:
+        # Robust clipping then remap
+        out[cos_col] = out[cos_col].astype(float).clip(-1.0, 1.0)
+        out[align_col] = _remap_01(out[cos_col])
+    else:
+        # Neutral fallback (keeps pipeline running on mock if cos_theta not produced yet)
+        out[align_col] = 0.5
+
+    # Safety: clip
+    out[align_col] = out[align_col].astype(float).clip(0.0, 1.0)
     return out

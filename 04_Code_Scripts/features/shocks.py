@@ -1,53 +1,75 @@
-# features/shocks.py — aligner shocks sur fenêtres
 from __future__ import annotations
 import pandas as pd
+from typing import Iterable
 
-def load_shocks(path: str | None = "data/mock/shocks.csv") -> pd.DataFrame:
+
+def load_shocks(path: str = "data/mock/shocks.csv") -> pd.DataFrame:
+    """Charge le CSV de chocs (doit contenir au minimum: domain_id, date, shock_id)."""
     df = pd.read_csv(path)
     df["date"] = pd.to_datetime(df["date"])
     return df
 
-def tag_windows_with_shocks(win_df: pd.DataFrame, shocks_df: pd.DataFrame) -> pd.DataFrame:
+
+def tag_windows_with_shocks(
+    win_df: pd.DataFrame,
+    shocks_df: pd.DataFrame,
+    lags: Iterable[int] = (0, 7, 14),
+) -> pd.DataFrame:
     """
-    Jointure robuste :
-    - conserve win_start / win_end en STRING (pour compat avec sliding_windows)
-    - crée des colonnes datetime temporaires pour le test d'intersection
-    - agrège n_shocks par (actor_id, domain_id, win_start, win_end) en gardant les types d'origine
+    Aligne les chocs sur les fenêtres, avec décalages (lags) en jours.
+
+    Pour chaque lag L, crée:
+      - n_shocks_lag{L} : nb de chocs dont la date ∈ [win_start+L, win_end+L]
+      - has_shock_lag{L} : 1 si n_shocks_lag{L} > 0, sinon 0
+
+    Conserve win_start / win_end en STRING (compat sliding_windows), utilise
+    des colonnes datetime temporaires pour les comparaisons.
     """
-    # Copie de travail (on garde les strings d'origine)
     base = win_df.copy()
+    base["_ws_dt"] = pd.to_datetime(base["win_start"])
+    base["_we_dt"] = pd.to_datetime(base["win_end"])
 
-    # Colonnes datetime TEMPORAIRES pour le test d'intersection
-    work = base.copy()
-    work["_ws"] = pd.to_datetime(work["win_start"])
-    work["_we"] = pd.to_datetime(work["win_end"])
+    shocks = shocks_df.copy()
+    shocks["date"] = pd.to_datetime(shocks["date"])
 
-    shocks = shocks_df.copy()  # date déjà en datetime
+    out = base.copy()
 
-    # Merge par domaine, puis marquer si le shock tombe dans [ws, we]
-    work = work.merge(shocks[["domain_id", "date", "shock_id"]], on="domain_id", how="left")
-    hits = (work["date"] >= work["_ws"]) & (work["date"] <= work["_we"])
-    work["shock_in_window"] = hits.fillna(False)
+    for L in lags:
+        # Fenêtres décalées (datetime)
+        ws = base["_ws_dt"] + pd.to_timedelta(L, unit="D")
+        we = base["_we_dt"] + pd.to_timedelta(L, unit="D")
 
-    # Agréger par clés TEXTE d'origine (pas les colonnes datetime)
-    agg = (
-        work.groupby(["actor_id", "domain_id", "win_start", "win_end"], dropna=False)
-            .agg(n_shocks=("shock_in_window", "sum"))
+        tmp = base[["actor_id", "domain_id", "win_start", "win_end"]].copy()
+        tmp["_ws_dt"] = ws
+        tmp["_we_dt"] = we
+
+        merged = tmp.merge(
+            shocks[["domain_id", "date", "shock_id"]],
+            on="domain_id",
+            how="left",
+        )
+        hit = (merged["date"] >= merged["_ws_dt"]) & (merged["date"] <= merged["_we_dt"])
+        merged["hit"] = hit.fillna(False)
+
+        agg = (
+            merged.groupby(["actor_id", "domain_id", "win_start", "win_end"], dropna=False)
+            .agg(n=("hit", "sum"))
             .reset_index()
-    )
+        )
 
-    # Merge des agrégats sur le DataFrame original (types identiques → pas de conflit)
-    final = base.merge(
-        agg,
-        on=["actor_id", "domain_id", "win_start", "win_end"],
-        how="left"
-    )
-    final["n_shocks"] = final["n_shocks"].fillna(0).astype(int)
-    final["has_shock"] = (final["n_shocks"] > 0).astype(int)
+        out = out.merge(
+            agg.rename(columns={"n": f"n_shocks_lag{L}"}),
+            on=["actor_id", "domain_id", "win_start", "win_end"],
+            how="left",
+        )
+        out[f"n_shocks_lag{L}"] = out[f"n_shocks_lag{L}"].fillna(0).astype(int)
+        out[f"has_shock_lag{L}"] = (out[f"n_shocks_lag{L}"] > 0).astype(int)
 
-    # Nettoyage des temporaires (elles ne sont pas dans `final`, mais au cas où)
-    for c in ("_ws", "_we", "date", "shock_id", "shock_in_window"):
-        if c in final.columns:
-            final = final.drop(columns=[c])
+    # Compat héritée (colonnes sans suffixe quand lag 0 est présent)
+    if 0 in lags:
+        if "n_shocks" not in out.columns:
+            out["n_shocks"] = out["n_shocks_lag0"]
+        if "has_shock" not in out.columns:
+            out["has_shock"] = out["has_shock_lag0"]
 
-    return final
+    return out.drop(columns=[c for c in ["_ws_dt", "_we_dt"] if c in out.columns])
