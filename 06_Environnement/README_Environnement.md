@@ -93,3 +93,5 @@ CUDA GPU (if needed; outside the CPU replication scope)
 Replace the torch==... line with a CUDA build that matches your driver.
 
 Remove the CPU --extra-index-url line if pointing to CUDA wheels.
+
+Back to the project overview: see the root [README.md](../README.md)
