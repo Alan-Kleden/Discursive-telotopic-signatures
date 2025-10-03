@@ -60,6 +60,7 @@ colorama==0.4.6
     # via
     #   click
     #   ipython
+    #   pytest
     #   tqdm
     #   wasabi
 comm==0.2.3
@@ -120,6 +121,8 @@ idna==3.10
     #   httpx
     #   jsonschema
     #   requests
+iniconfig==2.1.0
+    # via pytest
 ipykernel==6.30.1
     # via jupyterlab
 ipython==9.6.0
@@ -243,6 +246,7 @@ numpy==1.26.4
     #   matplotlib
     #   pandas
     #   patsy
+    #   pyarrow
     #   ruptures
     #   scikit-learn
     #   scipy
@@ -265,6 +269,7 @@ packaging==25.0
     #   jupyterlab-server
     #   matplotlib
     #   nbconvert
+    #   pytest
     #   spacy
     #   statsmodels
     #   thinc
@@ -287,6 +292,8 @@ pillow==11.3.0
     #   sentence-transformers
 platformdirs==4.4.0
     # via jupyter-core
+pluggy==1.6.0
+    # via pytest
 preshed==3.0.10
     # via
     #   spacy
@@ -299,6 +306,8 @@ psutil==7.1.0
     # via ipykernel
 pure-eval==0.2.3
     # via stack-data
+pyarrow==15.0.2
+    # via -r 06_Environnement/requirements.in
 pycircstat==0.0.2
     # via -r 06_Environnement/requirements.in
 pycparser==2.23
@@ -318,6 +327,8 @@ pygments==2.19.2
     #   nbconvert
 pyparsing==3.2.5
     # via matplotlib
+pytest==8.3.2
+    # via -r 06_Environnement/requirements.in
 python-dateutil==2.9.0.post0
     # via
     #   arrow
