@@ -1,0 +1,12 @@
+﻿# Fixed prereg thresholds/weights
+similarity_telos_min: 0.65
+ambivalence_percentile: 0.70
+ambivalence_tau_abs: 0.20
+weights_ntel:
+  alpha_intensifiers: 0.30
+  beta_modality: 0.20
+  gamma_tfidf: 0.25
+  delta_rhetorical: 0.15
+  epsilon_length: 0.10
+window_days: 30
+window_step_days: 7

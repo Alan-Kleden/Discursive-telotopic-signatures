@@ -1,0 +1,4 @@
+conda activate telotopic-311
+pip install pip-tools
+Copy-Item 06_Environnement\requirements.txt 06_Environnement\requirements.in
+pip-compile 06_Environnement\requirements.in --output-file 06_Environnement\requirements-lock.txt
