@@ -1,0 +1,30 @@
+﻿# OS / editors
+.DS_Store
+Thumbs.db
+*.tmp
+~$*.docx
+
+# Python & envs
+.venv/
+venv/
+.env/
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data & heavy folders
+02_Donnees_Corpus_LOURD/
+data/
+outputs/
+models/
+cache/
+*.parquet
+*.feather
+*.zip
+*.7z
+
+# Logs
+logs/
+*.log
