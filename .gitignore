@@ -28,3 +28,4 @@ cache/
 # Logs
 logs/
 *.log
+artifacts/
