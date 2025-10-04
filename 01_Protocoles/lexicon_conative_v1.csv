@@ -1,0 +1,14 @@
+﻿concept_id,lemma,language,type,pos,pattern_lemma_re,weight,notes
+must,must,EN,push,AUX,,0.90,strong obligation
+have_to,have,EN,push,PHRASE,\\bhave\\s+to\\b,0.85,necessity periphrastic
+should,should,EN,push,AUX,,0.70,advice/soft obligation
+accelerate,accelerate,EN,push,VERB,,0.60,speed up
+do_not_delay,delay,EN,inhibit,PHRASE,\\bdo\\s+not\\s+delay\\b,0.80,negated delay
+prevent,prevent,EN,inhibit,VERB,,0.90,prevent
+block,block,EN,inhibit,VERB,,0.85,block/obstruct
+devoir,devoir,FR,push,VERB,,0.90,obligation (modal fort)
+falloir,falloir,FR,push,PHRASE,\\bil\\s+(va\\s+)?falloir\\b,0.80,il faut / il va falloir
+accelerer,accélérer,FR,push,VERB,,0.65,augmenter la vitesse
+ne_pas_retarder,retarder,FR,inhibit,PHRASE,\\bne\\s+pas\\s+retarder\\b,0.80,négation + retarder
+empecher,empêcher,FR,inhibit,VERB,,0.90,empêcher/prévenir
+bloquer,bloquer,FR,inhibit,VERB,,0.85,bloquer/arrêter
