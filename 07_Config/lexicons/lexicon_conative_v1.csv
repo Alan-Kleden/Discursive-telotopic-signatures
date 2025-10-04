@@ -1,0 +1,83 @@
+concept_id,lemma,language,type,pos,pattern_lemma_re,weight,notes
+# ==== EN – PUSH (obligation / acceleration) ====
+must,must,EN,push,AUX,,0.90,strong obligation
+should,should,EN,push,AUX,,0.70,soft obligation/advice
+have_to,have,EN,push,PHRASE,\bhave\s+to\b,0.85,periphrastic necessity
+need_to,need,EN,push,PHRASE,\bneed\s+to\b,0.80,need-to construction
+ought_to,ought,EN,push,PHRASE,\bought\s+to\b,0.70,weak obligation
+it_is_time,it,EN,push,PHRASE,\bit\s+is\s+time\s+to\b,0.75,conative cue
+demand,demand,EN,push,VERB,,0.85,demand/require
+call_for,call,EN,push,PHRASE,\bcall(s)?\s+for\b,0.75,urge/request
+urge,urge,EN,push,VERB,,0.80,urge/press
+accelerate,accelerate,EN,push,VERB,,0.65,speed up
+speed_up,speed,EN,push,PHRASE,\bspeed\s+up\b,0.60,accelerate phrasal
+strengthen,strengthen,EN,push,VERB,,0.65,reinforce
+expand,expand,EN,push,VERB,,0.60,scale up
+implement,implement,EN,push,VERB,,0.60,execute policy
+adopt,adopt,EN,push,VERB,,0.60,adopt measure
+enact,enact,EN,push,VERB,,0.65,legislate
+invest,invest,EN,push,VERB,,0.60,resource commitment
+prioritize,prioritize,EN,push,VERB,,0.65,ranking to action
+immediately,immediately,EN,push,ADV,,0.50,time-urgency amplifier
+urgently,urgently,EN,push,ADV,,0.55,urgency
+at_once,at,EN,push,PHRASE,\bat\s+once\b,0.50,immediacy
+
+# ==== EN – INHIBIT (blocking / delaying / opposing) ====
+oppose,oppose,EN,inhibit,VERB,,0.80,resist/counter
+block,block,EN,inhibit,VERB,,0.85,obstruct
+prevent,prevent,EN,inhibit,VERB,,0.90,stop from happening
+ban,ban,EN,inhibit,VERB,,0.85,forbid
+prohibit,prohibit,EN,inhibit,VERB,,0.85,forbid formal
+halt,halt,EN,inhibit,VERB,,0.80,stop
+suspend,suspend,EN,inhibit,VERB,,0.75,temporary stop
+freeze,freeze,EN,inhibit,VERB,,0.75,stop progression
+delay,delay,EN,inhibit,VERB,,0.70,postpone
+slow_down,slow,EN,inhibit,PHRASE,\bslow\s+down\b,0.65,reduce pace
+repeal,repeal,EN,inhibit,VERB,,0.80,undo law
+roll_back,roll,EN,inhibit,PHRASE,\broll\s+back\b,0.75,reverse measure
+refuse_to,refuse,EN,inhibit,PHRASE,\brefuse\s+to\b,0.75,decline action
+abstain_from,abstain,EN,inhibit,PHRASE,\babstain\s+from\b,0.70,withhold action
+do_not_VERB,do,EN,inhibit,PHRASE,\bdo\s+not\s+\w+\b,0.70,negated imperative proxy
+
+# ==== FR – PUSH (obligation / accélération) ====
+devoir,devoir,FR,push,AUX,,0.90,obligation (modal fort)
+falloir,falloir,FR,push,VERB,,0.80,impersonnel de nécessité
+il_faut,falloir,FR,push,PHRASE,\bil\s+faut\b,0.80,canonique
+il_va_falloir,falloir,FR,push,PHRASE,\bil\s+va\s+falloir\b,0.80,nécessité imminente
+exiger,exiger,FR,push,VERB,,0.85,exiger/demander fermement
+imposer,imposer,FR,push,VERB,,0.80,imposer/obliger
+appeler_a,appeler,FR,push,PHRASE,\bappeler\s+à\b,0.75,appel à l’action
+inviter_a,inviter,FR,push,PHRASE,\binviter\s+à\b,0.70,invitation incitative
+encourager,encourager,FR,push,VERB,,0.70,inciter positivement
+accélérer,accélérer,FR,push,VERB,,0.65,augmenter la vitesse
+accélérer_rythme,accélérer,FR,push,PHRASE,\baccélérer\s+le\s+rythme\b,0.65,locution
+renforcer,renforcer,FR,push,VERB,,0.65,renforcer/solidifier
+étendre,étendre,FR,push,VERB,,0.60,étendre/élargir
+mettre_en_oeuvre,mettre,FR,push,PHRASE,\bmettre\s+en\s+œuvre\b,0.60,implémenter
+adopter,adopter,FR,push,VERB,,0.60,adopter une mesure
+promulguer,promulguer,FR,push,VERB,,0.65,édicter/loi
+investir,investir,FR,push,VERB,,0.60,engager des ressources
+prioriser,prioriser,FR,push,VERB,,0.65,mettre en priorité
+immédiatement,immédiatement,FR,push,ADV,,0.50,urgence temporelle
+d_urgence,urgence,FR,push,PHRASE,\bd['’]\s?urgence\b,0.55,marque d’urgence
+sans_delai,delai,FR,push,PHRASE,\bsans\s+d[ée]lai\b,0.55,immédiateté
+
+# ==== FR – INHIBIT (blocage / temporisation / opposition) ====
+s_opposer_a,opposer,FR,inhibit,PHRASE,\bs['’]opposer\s+à\b,0.80,s’opposer
+bloquer,bloquer,FR,inhibit,VERB,,0.85,obstruer/arrêter
+empêcher,empêcher,FR,inhibit,VERB,,0.90,prévenir/empêcher
+interdire,interdire,FR,inhibit,VERB,,0.85,prohiber
+suspendre,suspendre,FR,inhibit,VERB,,0.75,arrêt temporaire
+geler,geler,FR,inhibit,VERB,,0.75,figer/stopper
+abroger,abroger,FR,inhibit,VERB,,0.80,abroger/annuler
+retarder,retarder,FR,inhibit,VERB,,0.70,remettre à plus tard
+ralentir,ralentir,FR,inhibit,VERB,,0.65,diminuer la cadence
+revenir_en_arriere,revenir,FR,inhibit,PHRASE,\brevenir\s+en\s+arri[èe]re\b,0.75,rollback
+refuser_de,refuser,FR,inhibit,PHRASE,\brefuser\s+de\b,0.75,refus d’action
+s_abstenir_de,abstenir,FR,inhibit,PHRASE,\bs['’]abstenir\s+de\b,0.70,retenue d’action
+ne_pas_VERB,ne,FR,inhibit,PHRASE,\bne\s+pas\s+\w+\b,0.70,négation verbale
+mettre_en_pause,mettre,FR,inhibit,PHRASE,\bmettre\s+en\s+pause\b,0.70,temporisation
+
+# ==== NEUTRE / aides (peu pondérés, utiles en combo) ====
+consider,consider,EN,push,VERB,,0.35,faible conatif (pré-décision)
+envisager,envisager,FR,push,VERB,,0.35,faible conatif (pré-décision)
