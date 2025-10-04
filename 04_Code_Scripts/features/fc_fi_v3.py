@@ -1,92 +1,168 @@
 # 04_Code_Scripts/features/fc_fi_v3.py
 from __future__ import annotations
-import numpy as np
+import os
+from typing import Optional, Dict, Tuple
 import pandas as pd
-import re as _re_std
-from .theta import add_theta_features
 
-# --- try 'regex' (supports \p{L}); fallback to std 're' with Latin-extended class ---
-try:
-    import regex as _rx
-    WORD_RE = _rx.compile(r"\p{L}+", flags=_rx.UNICODE)
-except Exception:
-    WORD_RE = _re_std.compile(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", flags=_re_std.UNICODE)
+# spaCy is required in v3
+import spacy
 
-# --- fixed cross-term (preregistered) ---
-LAMBDA = 0.5  # λ fixed a priori
+from features.conative import (
+    load_conative_lexicon,
+    conative_from_text,
+)
 
-# Minimal conative lexicon
-PUSH = {
-    "devoir": 0.9, "falloir": 0.85, "exiger": 0.85,
-    "accélérer": 0.7, "renforcer": 0.6, "agir": 0.6,
-    "imposer": 0.7, "décider": 0.6, "mettre_en_oeuvre": 0.65,
-}
-INHIBIT = {
-    "empêcher": 0.9, "bloquer": 0.85, "s_opposer": 0.8,
-    "refuser": 0.75, "ralentir": 0.6, "suspendre": 0.7,
-    "abroger": 0.7,
-}
-AMP_WORDS = {"très": 0.15, "absolument": 0.2, "immédiatement": 0.1}
+# λ (cross-term) fixed a priori per Appendix A4 clarification
+_LAMBDA = 0.5
 
-def _tokens(text: str) -> list[str]:
-    if not isinstance(text, str) or not text:
-        return []
-    txt = text.replace(" ", "_")
-    return [m.group(0).lower() for m in WORD_RE.finditer(txt)]
+def _need_langs_from_df(df: pd.DataFrame, lang_col: Optional[str]) -> set[str]:
+    if lang_col is None or lang_col not in df.columns:
+        return {"FR"}  # default
+    vals = set(str(x).upper() for x in df[lang_col].dropna().unique().tolist())
+    keep = set()
+    for v in vals:
+        if v in {"FR", "FRENCH"}:
+            keep.add("FR")
+        elif v in {"EN", "ENGLISH"}:
+            keep.add("EN")
+    if not keep:
+        keep = {"FR"}
+    return keep
 
-def _score_conation(text: str) -> tuple[float, float]:
-    toks = _tokens(text)
-    push = 0.0
-    inh  = 0.0
-    for t in toks:
-        if t in PUSH:
-            push += PUSH[t]
-        if t in INHIBIT:
-            inh += INHIBIT[t]
-    amp = sum(AMP_WORDS.get(t, 0.0) for t in toks)
-    push += amp
-    inh  += amp
-    return push, inh
+def _load_spacy_models(langs: set[str]) -> Dict[str, "spacy.Language"]:
+    models: Dict[str, "spacy.Language"] = {}
+    if "FR" in langs:
+        try:
+            models["FR"] = spacy.load("fr_core_news_lg")
+        except Exception as e:
+            raise RuntimeError("spaCy FR model 'fr_core_news_lg' not available") from e
+    if "EN" in langs:
+        try:
+            models["EN"] = spacy.load("en_core_web_lg")
+        except Exception as e:
+            raise RuntimeError("spaCy EN model 'en_core_web_lg' not available") from e
+    return models
 
-def _p90_norm(x: pd.Series) -> pd.Series:
-    if len(x) == 0:
-        return x.astype(float)
-    vals = x.astype(float).to_numpy()
-    finite = vals[np.isfinite(vals)]
-    p = np.nanpercentile(finite, 90) if finite.size else 1.0
-    if p <= 1e-12:
-        return pd.Series(0.0, index=x.index, dtype=float)
-    return (x.astype(float) / p).clip(0.0, 1.0)
+def _resolve_alignment(row: pd.Series, alignment_col: Optional[str]) -> float:
+    """
+    Alignment a(d,T) ∈ [0,1]. If not provided, return neutral 0.5.
+    """
+    if alignment_col and alignment_col in row and pd.notna(row[alignment_col]):
+        try:
+            a = float(row[alignment_col])
+            if a < 0.0: a = 0.0
+            if a > 1.0: a = 1.0
+            return a
+        except Exception:
+            pass
+    return 0.5
+
+def _compute_fc_fi_beta(text: str,
+                        lang: str,
+                        nlp_map: Dict[str, "spacy.Language"],
+                        lexicon: Dict[str, Dict[str, float]],
+                        alignment: float) -> Tuple[float, float, float]:
+    lang = "FR" if str(lang).upper() in {"", "NONE", "NAN"} else str(lang).upper()
+    if lang not in nlp_map:
+        # fallback to FR if unknown label appears (row-level tolerant)
+        lang = "FR"
+    nlp = nlp_map[lang]
+
+    push, inh, _dbg = conative_from_text(text, lang, nlp, lexicon)  # already in [0,1] after clipping
+    # A4 clarification (λ=0.5 fixed):
+    # Fc = p*a + λ*h*(1-a)
+    # Fi = h*a + λ*p*(1-a)
+    fc = push * alignment + _LAMBDA * inh * (1.0 - alignment)
+    fi = inh  * alignment + _LAMBDA * push * (1.0 - alignment)
+
+    # β = ( (Fc - Fi) + 1 ) / 2 ∈ [0,1]
+    beta = ((fc - fi) + 1.0) / 2.0
+    if beta < 0.0: beta = 0.0
+    if beta > 1.0: beta = 1.0
+    return float(fc), float(fi), float(beta)
 
 def apply_fc_fi_v3(df: pd.DataFrame,
                    text_col: str = "text",
-                   align_col: str = "alignment") -> pd.DataFrame:
+                   lang_col: Optional[str] = None,
+                   alignment_col: Optional[str] = None,
+                   lexicon_path: Optional[str] = None) -> pd.DataFrame:
     """
-    Compute fc/fi with λ cross term and derive beta_modality in [0,1].
-    Ensures an 'alignment' column exists (via add_theta_features if needed).
+    Compute Fc, Fi, beta (A4 clarification with λ=0.5) for each row of df.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Must contain at least `text_col`. If `lang_col` is provided, values should be 'FR' or 'EN'.
+    text_col : str
+        Column with raw text.
+    lang_col : Optional[str]
+        Optional column with language code per row (FR/EN). If None or missing, defaults to FR.
+    alignment_col : Optional[str]
+        Optional column with alignment a(d,T) in [0,1]. If None or missing, defaults to 0.5 (neutral).
+    lexicon_path : Optional[str]
+        Path to csv lexicon. If None, read from env CONATIVE_LEXICON_PATH or
+        default '01_Protocoles/lexicon_conative_v1.csv'.
+
+    Returns
+    -------
+    DataFrame
+        df with added columns: 'fc', 'fi', 'beta'. It preserves other columns.
     """
+    if text_col not in df.columns:
+        raise ValueError(f"[fc_fi_v3] text_col '{text_col}' is missing in df")
+
+    # Resolve lexicon path
+    lex_path = (
+        lexicon_path
+        or os.environ.get("CONATIVE_LEXICON_PATH")
+        or "01_Protocoles/lexicon_conative_v1.csv"
+    )
+    if not os.path.exists(lex_path):
+        raise FileNotFoundError(f"[fc_fi_v3] conative lexicon not found at '{lex_path}'")
+    lexicon = load_conative_lexicon(lex_path)  # fail-fast if malformed
+
+    # Load spaCy models for needed langs (fail-fast on missing models)
+    langs_needed = _need_langs_from_df(df, lang_col)
+    nlp_map = _load_spacy_models(langs_needed)
+
+    # Compute per row (row-level tolerant)
+    out_fc, out_fi, out_beta = [], [], []
+    for _, row in df.iterrows():
+        txt = str(row[text_col]) if pd.notna(row[text_col]) else ""
+        lang = str(row[lang_col]).upper() if (lang_col and lang_col in row and pd.notna(row[lang_col])) else "FR"
+        a = _resolve_alignment(row, alignment_col)
+        try:
+            fc, fi, beta = _compute_fc_fi_beta(txt, lang, nlp_map, lexicon, a)
+        except Exception:
+            # tolerate the row, mark zeros (and continue the batch)
+            fc, fi, beta = 0.0, 0.0, 0.5
+        out_fc.append(fc); out_fi.append(fi); out_beta.append(beta)
+
     out = df.copy()
-
-    if align_col not in out.columns:
-        out = add_theta_features(out, cos_col="cos_theta", align_col=align_col)
-
-    tmp = out[text_col].apply(_score_conation)
-    out["_push_raw"] = tmp.apply(lambda t: t[0]).astype(float)
-    out["_inh_raw"]  = tmp.apply(lambda t: t[1]).astype(float)
-
-    out["push"] = _p90_norm(out["_push_raw"])
-    out["inh"]  = _p90_norm(out["_inh_raw"])
-
-    a = out[align_col].astype(float).clip(0.0, 1.0)
-    p = out["push"]
-    h = out["inh"]
-
-    # lowercase outputs expected downstream
-    out["fc"] = (p * a) + (LAMBDA * h * (1.0 - a))
-    out["fi"] = (h * a) + (LAMBDA * p * (1.0 - a))
-
-    M = (out["fc"] - out["fi"]).clip(-1.0, 1.0)
-    out["beta_modality"] = ((M + 1.0) / 2.0).clip(0.0, 1.0)
-
-    out.drop(columns=["_push_raw", "_inh_raw"], inplace=True, errors="ignore")
+    out["fc"] = out_fc
+    out["fi"] = out_fi
+    out["beta"] = out_beta
     return out
+
+def _precheck_or_fail() -> None:
+    """
+    Quick fail-fast check for CI / shell sanity:
+      - lexicon file present & well-formed
+      - spaCy FR/EN models load
+    """
+    lex_path = (
+        os.environ.get("CONATIVE_LEXICON_PATH")
+        or "01_Protocoles/lexicon_conative_v1.csv"
+    )
+    if not os.path.exists(lex_path):
+        raise FileNotFoundError(f"[fc_fi_v3 precheck] missing lexicon at '{lex_path}'")
+    load_conative_lexicon(lex_path)
+    # Load both to fail-fast if pipeline will need EN later
+    try:
+        _ = spacy.load("fr_core_news_lg")
+    except Exception as e:
+        raise RuntimeError("Missing spaCy FR model 'fr_core_news_lg'") from e
+    try:
+        _ = spacy.load("en_core_web_lg")
+    except Exception as e:
+        raise RuntimeError("Missing spaCy EN model 'en_core_web_lg'") from e

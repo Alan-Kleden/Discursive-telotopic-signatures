@@ -1,55 +1,43 @@
 # 04_Code_Scripts/run_mock_pipeline.py
 from __future__ import annotations
-import pandas as pd
-import numpy as np
+import os
 from pathlib import Path
+import pandas as pd
 
-from features.theta import add_theta_features
-from features.fc_fi_v3 import apply_fc_fi_v3
-
-IN_PATH  = Path("data/mock/docs.parquet")
-OUT_PATH = Path("artifacts/mock/features_doc.parquet")
-
-def _ensure_timestamp(df: pd.DataFrame) -> pd.DataFrame:
-    """S’assure qu’au moins une colonne temporelle standard est présente."""
-    if any(c in df.columns for c in ["published_at", "date", "created_at", "timestamp"]):
-        return df
-    # Essai de récupération si un nom exotique existe (fallback très conservateur)
-    # Sinon on abandonne proprement avec un message clair.
-    raise SystemExit(
-        "Input docs have no timestamp column. Expected one of: "
-        "'published_at', 'date', 'created_at', 'timestamp'. "
-        "Fix mock_data or map your column to one of these names."
-    )
+from features.fc_fi_v3 import apply_fc_fi_v3, _precheck_or_fail
 
 def main():
-    if not IN_PATH.exists():
-        raise SystemExit("Run mock generator first: .\\tasks.ps1 mock:gen")
+    _precheck_or_fail()
 
-    # On garde un backup pour ne pas perdre de colonnes si une fonction renvoie un sous-ensemble
-    orig = pd.read_parquet(IN_PATH)
-    orig = _ensure_timestamp(orig)
+    in_path = Path("data/mock/docs.parquet")
+    if not in_path.exists():
+        raise FileNotFoundError(f"Need {in_path} — run mock:gen first.")
+    df = pd.read_parquet(in_path)
 
-    # 1) alignement si absent
-    df = add_theta_features(orig.copy(), cos_col="cos_theta", align_col="alignment")
+    # Columns in mock: text lives in 'text'; language optional ('lang')
+    text_col = "text" if "text" in df.columns else df.select_dtypes(include="object").columns[0]
+    lang_col = "lang" if "lang" in df.columns else None
+    # If you have an alignment feature already computed elsewhere, put its column name here
+    alignment_col = "alignment" if "alignment" in df.columns else None
 
-    # 2) Fc/Fi v3 -> ajoute fc, fi, beta_modality sans supprimer les autres colonnes
-    res = apply_fc_fi_v3(df, text_col="text", align_col="alignment")
-    # Si apply_fc_fi_v3 a renvoyé un DataFrame réduit, on réinjecte proprement
-    for col in ["fc", "fi", "beta_modality"]:
-        if col in res.columns and col not in df.columns:
-            df[col] = res[col]
+    out = apply_fc_fi_v3(
+        df,
+        text_col=text_col,
+        lang_col=lang_col,
+        alignment_col=alignment_col,
+        lexicon_path=os.environ.get("CONATIVE_LEXICON_PATH") or "01_Protocoles/lexicon_conative_v1.csv",
+    )
 
-    # 3) n_tel minimal (placeholder borné)
-    df["n_tel"] = df["beta_modality"].astype(float).clip(0.0, 1.0)
+    # For compatibility with downstream windows/baselines, keep a simple n_tel placeholder
+    # (you can later plug the full N_tel formula if needed)
+    if "len_tokens" not in out.columns:
+        out["len_tokens"] = out[text_col].fillna("").str.split().map(len)
+    out["n_tel"] = out["beta"]  # simple stand-in so windows can aggregate
 
-    # 4) ambivalence_flag si absent (par défaut: 0)
-    if "ambivalence_flag" not in df.columns:
-        df["ambivalence_flag"] = 0
-
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(OUT_PATH, index=False)
-    print("OK: artifacts/mock/features_doc.parquet (mode=v2+v3)")
+    out_path = Path("artifacts/mock/features_doc.parquet")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out.to_parquet(out_path, index=False)
+    print(f"OK: {out_path} (mode=v2+v3)")
 
 if __name__ == "__main__":
     main()
