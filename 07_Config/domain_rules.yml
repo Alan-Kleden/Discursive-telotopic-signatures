@@ -1,0 +1,10 @@
+domains:
+  climate:
+    keywords: ["climate", "net zero", "emissions", "carbon", "renewable", "decarbon", "green deal", "energy transition"]
+  immigration:
+    keywords: ["immigration", "border", "asylum", "visa", "deportation", "removal", "migrant", "migration", "refugee"]
+  security:
+    keywords: ["security", "terrorism", "policing", "counter-terrorism", "defence", "national security", "law enforcement"]
+  health:
+    keywords: ["health", "NHS", "public health", "pandemic", "medical", "healthcare", "disease", "vaccination"]
+assignment_rule: "count>=2"   # ≥2 keywords du même domaine → assigné à ce domaine
