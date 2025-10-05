@@ -1,0 +1,11 @@
+actor_id,country,domains,source
+UK_Conservative,UK,"climate,immigration",https://www.conservatives.com/news
+UK_Labour,UK,"climate,health",https://labour.org.uk/press/
+UK_HomeOffice,UK,"immigration,security",https://www.gov.uk/government/organisations/home-office
+UK_MoD,UK,"security,immigration",https://www.gov.uk/government/organisations/ministry-of-defence
+UK_MigrationWatch,UK,"immigration,security",https://migrationwatchuk.org/briefing-papers
+US_House_Democrats,US,"climate,health",https://api.congress.gov/
+US_House_Republicans,US,"immigration,security",https://api.congress.gov/
+US_DHS,US,"immigration,security",https://www.dhs.gov/news-releases
+US_DOJ,US,"security,immigration",https://www.justice.gov/news
+US_Heritage,US,"immigration,security",https://www.heritage.org/commentary

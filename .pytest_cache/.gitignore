@@ -1,0 +1,34 @@
+# --- Base: ignorer tout par défaut ---
+/*
+
+# --- Autoriser fichiers/dirs utiles (whitelist) ---
+!/.gitignore
+!/README.md
+!/tasks.ps1
+
+!/04_Code_Scripts/**
+!/07_Config/**
+
+# Données: on versionne seulement des échantillons légers
+!/data/
+!/data/README.md
+!/data/samples/**
+
+# --- Continuer d'ignorer le reste des données et artefacts lourds ---
+/artifacts/**
+/data/raw/**
+/data/**/*.parquet
+/data/**/*.zip
+/data/**/*.7z
+/data/**/*.pdf
+/data/**/*.log
+
+# Caches & divers
+/__pycache__/
+/.ipynb_checkpoints/
+/*.log
+/.env
+/.vscode/
+/.idea/
+.DS_Store
+Thumbs.db
