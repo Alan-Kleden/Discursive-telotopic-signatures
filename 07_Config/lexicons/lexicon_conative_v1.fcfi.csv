@@ -1,0 +1,17 @@
+pattern,class,weight,note
+nan,fc,0.9,from_v1_mapped
+\bhave\s+to\b,fc,0.85,from_v1_mapped
+\bneed\s+to\b,fc,0.8,from_v1_mapped
+\bought\s+to\b,fc,0.7,from_v1_mapped
+\bit\s+is\s+time\s+to\b,fc,0.75,from_v1_mapped
+\bcall(s)?\s+for\b,fc,0.75,from_v1_mapped
+\bspeed\s+up\b,fc,0.6,from_v1_mapped
+\bat\s+once\b,fc,0.5,from_v1_mapped
+\bil\s+faut\b,fc,0.8,from_v1_mapped
+\bil\s+va\s+falloir\b,fc,0.8,from_v1_mapped
+\bappeler\s+à\b,fc,0.75,from_v1_mapped
+\binviter\s+à\b,fc,0.7,from_v1_mapped
+\baccélérer\s+le\s+rythme\b,fc,0.65,from_v1_mapped
+\bmettre\s+en\s+œuvre\b,fc,0.6,from_v1_mapped
+\bd['’]\s?urgence\b,fc,0.55,from_v1_mapped
+\bsans\s+d[ée]lai\b,fc,0.55,from_v1_mapped

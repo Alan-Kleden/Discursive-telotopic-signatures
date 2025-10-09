@@ -1,0 +1,83 @@
+{
+  "timestamp": "2025-10-07T14:45:31.590224",
+  "scores": {
+    "infrastructure": 100,
+    "data_collection": 100,
+    "lexicon_validation": 0,
+    "shocks_dynamics": 25,
+    "statistical_models": 0,
+    "documentation": 100
+  },
+  "weighted_total": 47.5,
+  "github_summary": {
+    "compliance_score": 100.0,
+    "last_commit": "2025-10-07 14:44:42 +0200"
+  },
+  "local_summary": {
+    "total_files": 1223,
+    "total_size_gb": 0.1
+  },
+  "critical_gaps": [
+    {
+      "category": "Sample size",
+      "issue": "Only 3 actors (need ≥10 per prereg)",
+      "priority": "P0 - BLOCKING",
+      "impact": "Cannot run confirmatory H1/H2/H4"
+    },
+    {
+      "category": "Telos extraction",
+      "issue": "No endogenous teloi extracted",
+      "priority": "P0 - BLOCKING",
+      "impact": "θ and N_tel invalid, H1/H2/H4 impossible"
+    },
+    {
+      "category": "Lexicon validation",
+      "issue": "No manual annotations (gold standard)",
+      "priority": "P1 - CRITICAL",
+      "impact": "Fc/Fi validity unknown"
+    },
+    {
+      "category": "Shocks definition",
+      "issue": "Insufficient shocks or not validated",
+      "priority": "P1 - CRITICAL",
+      "impact": "H3 not testable"
+    }
+  ],
+  "recommended_actions": [
+    {
+      "action": "1. Clean .venv_old from Git",
+      "duration": "10 min",
+      "outcome": "Reduce repo bloat (855→~50 py files)"
+    },
+    {
+      "action": "2. Create requirements.txt",
+      "duration": "5 min",
+      "outcome": "Enable reproducibility"
+    },
+    {
+      "action": "3. Add LICENSE",
+      "duration": "5 min",
+      "outcome": "Legal clarity"
+    },
+    {
+      "action": "4. Annotate 20 docs manually",
+      "duration": "4 hours",
+      "outcome": "Enable lexicon validation"
+    },
+    {
+      "action": "5. Define 12 shocks (4 domains)",
+      "duration": "4 hours",
+      "outcome": "Enable H3 testing"
+    },
+    {
+      "action": "6. Extract teloi (≥3 actors)",
+      "duration": "1 week",
+      "outcome": "Enable H1/H2/H4"
+    },
+    {
+      "action": "7. Extend corpus (≥10 actors)",
+      "duration": "3-4 weeks",
+      "outcome": "Meet prereg minima"
+    }
+  ]
+}

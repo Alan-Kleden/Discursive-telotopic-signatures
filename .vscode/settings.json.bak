@@ -1,0 +1,18 @@
+﻿{
+    "python.envFile":  "${workspaceFolder}\\.env",
+    "python.defaultInterpreterPath":  "C:\\Users\\ojahi\\anaconda3\\envs\\telotopic-311\\python.exe",
+    "python.analysis.autoImportCompletions":  true,
+    "python.linting.enabled":  true,
+    "python.testing.pytestEnabled":  true,
+    "terminal.integrated.defaultProfile.windows":  "PoC (PowerShell)",
+    "terminal.integrated.profiles.windows":  {
+                                                 "PoC (PowerShell)":  {
+                                                                          "path":  "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                                                                          "args":  [
+                                                                                       "-NoExit",
+                                                                                       "-Command",
+                                                                                       "conda activate telotopic-311; Set-Location \"G:\\Mon Drive\\Signatures_Telotopiques_POC\"; $env:PYTHONPATH=(Resolve-Path \u0027.\\04_Code_Scripts\u0027)"
+                                                                                   ]
+                                                                      }
+                                             }
+}

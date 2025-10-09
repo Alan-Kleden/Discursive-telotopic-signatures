@@ -1,0 +1,5 @@
+﻿raw_dir: H:/Data/Telotopic/00_Raw
+intermediate_dir: H:/Data/Telotopic/10_Intermediate
+processed_dir: H:/Data/Telotopic/20_Processed
+results_dir: ../05_Resultats
+
