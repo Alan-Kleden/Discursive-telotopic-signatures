@@ -1,4 +1,2 @@
-# Normalize line endings to LF
-* text=auto eol=lf
-"*.ps1" text eol=crlf
-"*.bat" text eol=crlf
+﻿* text=auto eol=lf
+
