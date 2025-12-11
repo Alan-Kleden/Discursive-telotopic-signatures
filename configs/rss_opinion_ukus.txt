@@ -1,0 +1,13 @@
+﻿https://www.theguardian.com/uk/commentisfree/rss
+https://www.telegraph.co.uk/opinion/rss.xml
+https://www.newstatesman.com/opinion/feed
+https://www.spectator.co.uk/feed/
+https://unherd.com/feed/
+https://www.nytimes.com/svc/collections/v1/publish/www/section/opinion/rss.xml
+https://www.theatlantic.com/feed/all/
+https://feed.vox.com/
+https://www.nationalreview.com/feed/
+https://www.brookings.edu/feed/
+https://www.cato.org/blog/feed
+https://www.aei.org/feed/
+https://www.ippr.org/feed

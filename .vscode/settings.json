@@ -1,5 +1,5 @@
 {
-  "python.defaultInterpreterPath": "C:\\Users\\ojahi\\anaconda3\\envs\\telotopic-311\\python.exe",
+  "python.defaultInterpreterPath": "C:\\Users\\ojahi\\Miniconda3\\envs\\telotopic-311\\python.exe",
   "python.envFile": "${workspaceFolder}\\.env",
   "python.terminal.useEnvFile": true,
   "python.terminal.activateEnvironment": true,

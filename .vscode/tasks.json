@@ -1,0 +1,7 @@
+﻿{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "P1: Validate lot", "type": "shell", "command": "python .\\scripts\\poc_tools\\validate_lot.py" },
+    { "label": "P1: QC kappa",     "type": "shell", "command": "python .\\scripts\\poc_tools\\qc_kappa.py" }
+  ]
+}
