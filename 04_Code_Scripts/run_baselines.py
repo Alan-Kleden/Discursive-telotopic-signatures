@@ -89,8 +89,15 @@ def main():
     # Scores baselines :
     # 1) Telotopic linear (n_tel_mean)
     if "n_tel_mean" not in df.columns:
-        # tolérance : si vraiment absent, fallback minimal = fc_mean - fi_mean
-        telotopic_score = (df["fc_mean"] - df["fi_mean"]).fillna(0.0)
+        # Fc⊗Fi orthogonality correction (March 2026)
+        # Ref: Prolegomena v1.0 doi:10.5281/zenodo.19003446
+        # OSF Amendment: osf.io/rm42h
+        # Previous: fc_mean - fi_mean (subtraction, incompatible with ⊗)
+        # Revised: Euclidean norm normalised to [0,1]
+        import numpy as _np
+        telotopic_score = (
+            _np.sqrt(df["fc_mean"]**2 + df["fi_mean"]**2) / _np.sqrt(2)
+        ).fillna(0.0)
     else:
         telotopic_score = df["n_tel_mean"].fillna(0.0)
 

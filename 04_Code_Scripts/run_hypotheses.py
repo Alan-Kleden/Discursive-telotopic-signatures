@@ -93,7 +93,15 @@ def main():
     if "n_tel_mean" in df.columns:
         s_tel = df["n_tel_mean"].fillna(0.0).to_numpy(dtype=float)
     else:
-        s_tel = (df["fc_mean"] - df["fi_mean"]).fillna(0.0).to_numpy(dtype=float)
+        # Fc⊗Fi orthogonality correction (March 2026)
+        # Ref: Prolegomena v1.0 doi:10.5281/zenodo.19003446
+        # OSF Amendment: osf.io/rm42h
+        # Previous: fc_mean - fi_mean (subtraction, incompatible with ⊗)
+        # Revised: Euclidean norm normalised to [0,1]
+        import numpy as _np
+        s_tel = (
+            _np.sqrt(df["fc_mean"]**2 + df["fi_mean"]**2) / _np.sqrt(2)
+        ).fillna(0.0).to_numpy(dtype=float)
 
     # Style score (len_tokens_mean normalisé)
     if "len_tokens_mean" in df.columns:
