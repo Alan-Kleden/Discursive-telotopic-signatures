@@ -32,7 +32,7 @@ def main():
     # (you can later plug the full N_tel formula if needed)
     if "len_tokens" not in out.columns:
         out["len_tokens"] = out[text_col].fillna("").str.split().map(len)
-    out["n_tel"] = out["beta"]  # simple stand-in so windows can aggregate
+    out["n_tel"] = out["f_total"]  # stand-in proxy: Euclidean resultant √(fc²+fi²)/√2 under Fc⊗Fi
 
     out_path = Path("artifacts/mock/features_doc.parquet")
     out_path.parent.mkdir(parents=True, exist_ok=True)
