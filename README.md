@@ -52,7 +52,17 @@ CPU-only baseline (PyTorch CPU wheels). Switch to CUDA if needed by adjusting To
 
 Exact package set captured in requirements-lock.txt (generated via pip-compile).
 
-Contact
+## Human Annotation PoC — Formal Closure (May 2026)
+
+- ✅ 10 annotators completed (1 Gold #1, 1 Gold #2, 8 external)
+- ❌ Inter-annotator agreement gate not met: Krippendorff α = −0.034 (threshold κ ≥ 0.70)
+- 🔍 Root cause: Fi operationalization exceeds realistic cognitive capacity 
+  for non-expert annotators (structural constraint, not a training failure)
+- 🔄 Human annotation PoC transitions to opportunistic mode
+- 🚀 Primary confirmatory device: PoC A (automated NLP pipeline)
+- 📄 Full closure report: https://osf.io/rm42h
+
+## Contact
 
 Lead contact: Alan Kleden — ak@alankleden.com
  / alan.kleden@gmail.com
